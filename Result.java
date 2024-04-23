@@ -1,12 +1,6 @@
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
 import java.util.function.BiFunction;
-
-import static java.lang.StrictMath.log;
 import static java.lang.StrictMath.sin;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+
 
 class Result {
     
@@ -30,11 +24,6 @@ class Result {
         return 0.0;
     }
     
-    /*
-    * How to use this function:
-    *    BiFunction<Double, Double, Double> func = get_function(4);
-    *    func.apply(0.0001);
-    */
     private static BiFunction<Double, Double, Double> get_function(int n) {
         switch (n) {
             case (1):
@@ -50,45 +39,27 @@ class Result {
         }
     }
     
-    /*
-     * Complete the 'solveByEulerImproved' function below.
-     *
-     * The function is expected to return a DOUBLE.
-     * The function accepts following parameters:
-     *  1. INTEGER f
-     *  2. DOUBLE epsilon
-     *  3. DOUBLE a
-     *  4. DOUBLE y_a
-     *  5. DOUBLE b
-     */
-    
-    public static double solveByEulerImproved(int f, double epsilon, double a, double y_a, double b) {
-        if (a >= b) {
-            throw new IllegalArgumentException("a must be less than b.");
-        }
-
-        double h = 0.1;
-        double x = a;
+    public static double solveByRungeKutta(int f, double epsilon, double a, double y_a, double b) {
+        double h = (b - a) / 1000;
         double y = y_a;
-
-        BiFunction<Double, Double, Double> func = get_function(f);
+        double x = a;
 
         while (x < b) {
-            double yPred = y + h * func.apply(x, y);
-            double yCorrected = y + h * (func.apply(x, y) + func.apply(x + h, yPred)) / 2.0;
+            var hMin = (x + h > b) ? (b - x) : h;
+            double k1 = hMin * get_function(f).apply(x, y);
+            double k2 = hMin * get_function(f).apply(x + hMin/2, y + k1/2);
+            double k3 = hMin * get_function(f).apply(x + hMin/2, y + k2/2);
+            double k4 = hMin * get_function(f).apply(x + hMin, y + k3);
+            var yNew = y + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
 
-            double error = Math.abs(yCorrected - yPred);
-
-            if (error < epsilon) {
-                y = yCorrected;
-                x += h;
+            if (Math.abs(yNew - y) > epsilon) {
+                h /= 2;
+            } else if (Math.abs(yNew - y) < epsilon) {
+                h *= 2;
             }
-
-            h = 0.9 * h * Math.pow(epsilon / error, 0.2);
-
-            if (x + h > b) {
-                h = b - x;
-            }
+        
+            x += hMin;
+            y = yNew;
         }
 
         return y;

@@ -1,12 +1,8 @@
-import java.io.*;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
-import static java.lang.StrictMath.log;
-import static java.lang.StrictMath.sin;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -23,7 +19,7 @@ public class Main {
 
         double b = Double.parseDouble(bufferedReader.readLine().trim());
 
-        double result = Result.solveByEulerImproved(f, epsilon, a, y_a, b);
+        double result = Result.solveByRungeKutta(f, epsilon, a, y_a, b);
 
         bufferedWriter.write(String.valueOf(result));
         bufferedWriter.newLine();
